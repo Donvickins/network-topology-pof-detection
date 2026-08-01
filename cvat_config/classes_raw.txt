@@ -1,0 +1,191 @@
+[
+  {
+    "name": "RTN_Yellow",
+    "id": 43,
+    "color": "#63fec7",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "RTN_Orange",
+    "id": 44,
+    "color": "#093aa7",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "RTN_Green",
+    "id": 45,
+    "color": "#616145",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "RTN_Red",
+    "id": 46,
+    "color": "#6ec3ab",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "RTN_Gray",
+    "id": 47,
+    "color": "#0b52de",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "RTN_Blue",
+    "id": 48,
+    "color": "#d5fdbc",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Link_Green",
+    "id": 49,
+    "color": "#481d82",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Link_Red",
+    "id": 50,
+    "color": "#226a74",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Link_Gray",
+    "id": 51,
+    "color": "#26822c",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Link_Blue",
+    "id": 52,
+    "color": "#a13fdb",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "ATN_Green",
+    "id": 53,
+    "color": "#ce0356",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "ATN_Yellow",
+    "id": 54,
+    "color": "#90a1aa",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "ATN_Orange",
+    "id": 55,
+    "color": "#ac103f",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "ATN_Red",
+    "id": 56,
+    "color": "#2afcb2",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "ATN_Gray",
+    "id": 57,
+    "color": "#6c9c84",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Router_Green",
+    "id": 58,
+    "color": "#79c6e5",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Router_Red",
+    "id": 59,
+    "color": "#6efa3f",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Switch_Red",
+    "id": 60,
+    "color": "#c04fca",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Switch_Orange",
+    "id": 61,
+    "color": "#f17e3a",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Router_Orange",
+    "id": 62,
+    "color": "#b974ff",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "Link_Orange",
+    "id": 63,
+    "color": "#ca856f",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "HubSite_Yellow",
+    "id": 64,
+    "color": "#0b85cc",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "HubSite_Red",
+    "id": 65,
+    "color": "#42a360",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "HubSite_Green",
+    "id": 66,
+    "color": "#c5e2ca",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "HubSite_Gray",
+    "id": 67,
+    "color": "#14be5b",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "HubSite_Orange",
+    "id": 68,
+    "color": "#61bc3d",
+    "type": "any",
+    "attributes": []
+  },
+  {
+    "name": "HubSite_Blue",
+    "id": 69,
+    "color": "#86e3cc",
+    "type": "any",
+    "attributes": []
+  }
+]

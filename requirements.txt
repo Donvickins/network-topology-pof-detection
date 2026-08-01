@@ -1,0 +1,13 @@
+pyyaml
+opencv-python
+pytesseract
+torch_geometric
+fuzzywuzzy
+python-Levenshtein
+ultralytics
+fastapi
+uvicorn
+nuitka
+colorama
+scipy
+pytesseract

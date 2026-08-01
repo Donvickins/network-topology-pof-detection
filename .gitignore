@@ -1,0 +1,13 @@
+**/*build*
+**/*dist*
+**/*test*
+!build.py
+.vscode/
+.venv
+.idea
+.vs
+.env
+.env.*
+logs/
+__pycache__/
+*.pyc
