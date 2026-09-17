@@ -44,35 +44,35 @@ save_dir.mkdir(exist_ok=True, parents=True)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
-        content={"status": "error", "message": "Validation error", "detail": exc.errors()}
+        content={"status": "error", "message": "Validation error", "details" : exc.errors(include_url=False, include_context=False, include_input=False)}
     )
 
 @app.exception_handler(NoSiteId)
-async def no_site_id_exception_handler(request: Request, exc: InvalidImageException):
+async def no_site_id_exception_handler(request: Request, exc: NoSiteId):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
-        content={"status": "error", "message": "No site id was provided"}
+        content={"status": "error", "message": exc.message}
     )
 
 @app.exception_handler(InvalidImageException)
 async def image_exception_handler(request: Request, exc: InvalidImageException):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
-        content={"status": "error", "message": f"Invalid image provided: {exc.details}"}
+        content={"status": "error", "message": exc.message}
     )
 
 @app.exception_handler(SiteIdNotFoundInImage)
 async def site_id_exception_handler(request: Request, exc: SiteIdNotFoundInImage):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
-        content={"status": "error", "message": "Site ID not found in image"}
+        content={"status": "error", "message" : exc.message}
     )
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"status": "error", "message": "An unexpected error occurred on the server."},
+        content={"status": "error", "message": "An unexpected error occurred, try again later"},
     )
 
 @app.post('/pof')
@@ -93,9 +93,13 @@ async def check_pof(request: pofRequest):
                 file.write(image_bytes)
         except Exception as e:
             logger.error(f'Failed to save image for order id: {request.order_id}. Reason: {e}')
+
+    except (NoSiteId, InvalidImageException, SiteIdNotFoundInImage):
+        raise
     except Exception as e:
         logger.error(f'Unexpected error occurred while processing order id: {request.order_id}. Reason: {e}')
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"status": "error", "message": "An unexpected error occurred on the server."})
+
 
     success_data = pofResponse(site_id=request.site_id, pof=predicted_pof, certainty=accuracy, order_id=request.order_id)
     return JSONResponse(status_code=status.HTTP_200_OK, content={
