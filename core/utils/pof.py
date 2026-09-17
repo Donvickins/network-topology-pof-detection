@@ -14,13 +14,10 @@ from core.utils import helpers as utils
 from core.gnn.model import GNN
 from core.utils.exception_handler import InvalidImageException, SiteIdNotFoundInImage, NoSiteId
 from core.utils.node_type_config import FUZZY_PERCENTAGE
+from core.utils.constants import DEVICE, NUM_NODE_FEATURES, CONF_LEVEL, IMGSZ
 
 logger = logging.getLogger(__name__)
 
-NUM_NODE_FEATURES = 12  # 5 (type) + 6 (color)  + 1 (down_id)
-CONF_LEVEL = 0.1
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-IMGSZ = 1280
 
 def prep_models(yolo_model_path, gnn_model_path) -> Tuple[YOLO, GNN]:
     """
@@ -86,7 +83,7 @@ def load_gnn_model(model_path, in_channels, hidden_channels, num_edge_features) 
         num_edge_features=num_edge_features
     )
 
-    model.load_state_dict(torch.load(model_path, weights_only=True))
+    model.load_state_dict(torch.load(model_path, weights_only=True, map_location=DEVICE))
     model.eval()
     return model
 
@@ -141,7 +138,7 @@ def pof(image, down_id: str, yolo_model, gnn_model) -> Tuple[str, float]:
         raise InvalidImageException('Image is not valid')
 
     # Run YOLO model on the image
-    yolo_data = yolo_model.predict(source=image, save=False, conf=CONF_LEVEL, verbose=False, imgsz=IMGSZ,device=DEVICE)
+    yolo_data = yolo_model.predict(source=image, save=False, conf=CONF_LEVEL, verbose=False, imgsz=IMGSZ, device=DEVICE)
     result = yolo_data[0]
 
     # class-wise counts

@@ -11,6 +11,7 @@ from pathlib import Path
 from fuzzywuzzy import fuzz
 from core.utils.exception_handler import InvalidImageException
 from core.utils.node_type_config import NODE_TYPE, COLOR_MAP, FUZZY_PERCENTAGE
+from core.utils.constants import DEVICE
 
 logger = logging.getLogger(__name__)
 # --- Constants and Mappings ---
@@ -228,7 +229,7 @@ def create_node_tensor(nodes: list, down_id: str = None) -> dict:
         node_ids.append(node['id'])
         node_features.append(feature)
 
-    x = torch.tensor(node_features, dtype=torch.float)
+    x = torch.tensor(node_features, dtype=torch.float).to(DEVICE)
     node_centers = np.array(node_centers)
 
     return {
@@ -251,15 +252,15 @@ def create_edges_tensor(edges: list, node_centers: list) -> dict:
     if len(node_centers) == 0:
         logger.warning("No node centers provided, cannot create edges.")
         return {
-            'edge_index': torch.empty((2, 0), dtype=torch.long).contiguous(),
-            'edge_attr': torch.empty((0, 6), dtype=torch.float)
+            'edge_index': torch.empty((2, 0), dtype=torch.long).contiguous().to(DEVICE),
+            'edge_attr': torch.empty((0, 6), dtype=torch.float).to(DEVICE)
         }
 
     if len(edges) == 0:
         logger.warning("No edges provided, returning empty edge tensors.")
         return {
-            'edge_index': torch.empty((2, 0), dtype=torch.long).contiguous(),
-            'edge_attr': torch.empty((0, 6), dtype=torch.float)
+            'edge_index': torch.empty((2, 0), dtype=torch.long).contiguous().to(DEVICE),
+            'edge_attr': torch.empty((0, 6), dtype=torch.float).to(DEVICE)
         }
 
     edge_list = []
@@ -292,8 +293,8 @@ def create_edges_tensor(edges: list, node_centers: list) -> dict:
     edge_attr = torch.tensor(edge_attributes, dtype=torch.float) if edge_attributes else torch.empty((0, 6), dtype=torch.float)
 
     return {
-        'edge_index': edge_index,
-        'edge_attr': edge_attr
+        'edge_index': edge_index.to(DEVICE),
+        'edge_attr': edge_attr.to(DEVICE)
     }
 
 def extract_data_from_YOLO(result: list, img: Union[str, Path, np.ndarray]) -> list:
