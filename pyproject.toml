@@ -1,0 +1,38 @@
+[project]
+name = "network-topology-pof-detection"
+version = "0.1.0"
+description = "Network Topology Point-of-Failure detection system"
+requires-python = "==3.12"
+dependencies = [
+  "fastapi==0.141.1",
+  "uvicorn==0.53.0",
+  "pydantic==2.13.5",
+  "ultralytics==8.4.154",
+  "pillow==12.3.0",
+  "opencv-python==5.0.0.93",
+  "pytesseract==0.3.13",
+  "fuzzywuzzy==0.18.0",
+  "python-Levenshtein==0.27.5",
+  "scipy==1.18.1",
+  "numpy==2.5.3",
+  "pyyaml==6.0.3",
+  "colorama==0.4.6",
+  "torch==2.14.0",
+  "torchvision==0.29.0",
+  "torch-geometric==2.8.0.post1",
+]
+
+[project.optional-dependencies]
+train = [
+  "matplotlib==3.11.2",
+]
+build = [
+  "nuitka==4.2.1",
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.pip-tools]
+generate-hashes = false
