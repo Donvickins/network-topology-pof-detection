@@ -7,7 +7,7 @@ import sys
 import cv2
 import torch
 import numpy as np
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 from typing import Tuple
 from ultralytics import YOLO
 from core.utils import helpers as utils

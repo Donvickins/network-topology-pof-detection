@@ -13,7 +13,6 @@ from core.utils.schema import Request as pofRequest, Response as pofResponse
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from core.utils.pof import pof, prep_models
-from pathlib import Path
 from core.gnn.model import GNN
 from core.utils.helpers import get_base_path
 from ultralytics import YOLO

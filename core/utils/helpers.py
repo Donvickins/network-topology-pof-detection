@@ -8,32 +8,17 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from typing import Union
 from pathlib import Path
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 from core.utils.exception_handler import InvalidImageException
 from core.utils.node_type_config import NODE_TYPE, COLOR_MAP, FUZZY_PERCENTAGE
-from core.utils.constants import DEVICE
+from core.utils.constants import DEVICE, TESS_OEM, TESS_PSM, TESS_CHARSET, MAX_DIST_THRESH, HSV_LOWER, HSV_UPPER, OCR_UPSCALE, TESS_LANGS, LABEL_DY_TOP, LABEL_HEIGHT, LABEL_DX_LEFT, LABEL_DX_RIGHT
+from core.utils.enums import OCR, IMAGE
+from core.utils.paths import get_base_path
 
 logger = logging.getLogger(__name__)
 # --- Constants and Mappings ---
 TYPE_MAP = {node_type: [1 if i == j else 0 for i in range(len(NODE_TYPE))] for j, node_type in enumerate(NODE_TYPE)}
 
-MAX_DIST_THRESH = 50
-
-def get_base_path() -> Path:
-    """
-    Determines the base path of the application, whether running as a script or a frozen executable.
-    This is crucial for locating bundled resources like Tesseract.
-    """
-        
-    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        # PyInstaller one-file mode
-        return Path(sys._MEIPASS)
-    elif Path(sys.argv[0]).resolve().suffix.lower() == '.exe':
-        # Nuitka or other .exe: sys.argv[0] is the path to the executable.
-        return Path(sys.argv[0]).resolve().parent
-    else:
-        # Running as a normal Python script
-        return Path(__file__).resolve().parents[2]
 
 # --- Tesseract Configuration ---
 # Use a bundled Tesseract executable if available, otherwise fall back to system PATH.
@@ -53,25 +38,42 @@ def _configure_tesseract() -> None:
         logger.warning(f"Bundled Tesseract not found at '{tesseract_path}'. Falling back to system PATH.")
     _tesseract_configured = True
 
-def extract_text(img) -> str | None:
+def extract_text(img) -> dict:
     """
     Performs OCR using Tesseract
 
     We use a custom configuration to specify character set and OCR mode
+    Which can be overitten in config.yaml
 
-    *custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'*
+    *Default: custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'*
     Args:
         img (cv2.Mat): OpenCV Image
 
     Returns:
-        str | None: A string containing the extracted data or None if OCR fails.
+        dict: A dict containing the extracted text and error None or text None, with error if OCR fails.
     """
-    custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
+    custom_config = f'--oem {TESS_OEM} --psm {TESS_PSM} -c tessedit_char_whitelist={TESS_CHARSET}'
+    langs = list(TESS_LANGS) if TESS_LANGS else ['eng']
+    if 'eng' not in langs:
+        langs = langs + ['eng']
+    result = {}
 
     _configure_tesseract()
 
-    try:
-        text = pytesseract.image_to_string(img, config=custom_config, lang='pof_ocr')
+    saw_tesseract_error = False
+    for lang in langs:
+        try:
+            text = pytesseract.image_to_string(img, config=custom_config, lang=lang)
+        except pytesseract.TesseractNotFoundError:
+            logger.error("Tesseract is not installed or not in your PATH. Please install it.")
+            result['text'] = None
+            result['code'] = OCR.TESSERACT_NOT_INSTALLED
+            result['error'] = OCR.TESSERACT_NOT_INSTALLED.value
+            return result
+        except pytesseract.TesseractError as e:
+            logger.warning(f"OCR with lang '{lang}' failed: {e}. Trying fallback.")
+            saw_tesseract_error = True
+            continue
         # Clean up the output by stripping whitespace and newlines
         text_s = text.strip()
         idx = text_s.find('_')
@@ -85,16 +87,18 @@ def extract_text(img) -> str | None:
             id = text_s[:idx]
 
         if id:
-            return id
-        else:
-            return 'invalid'
+            result['text'] = id
+            result['code'] = None
+            result['error'] = None
+            return result
 
-    except pytesseract.TesseractNotFoundError:
-        logger.error("Tesseract is not installed or not in your PATH. Please install it.")
-        raise
+    result['text'] = None
+    result['code'] = OCR.TESSERACT_ERROR if saw_tesseract_error else OCR.OCR_EMPTY
+    result['error'] = result['code'].value
+    return result
 
 
-def site_id_2_binary(img) -> Union[np.ndarray, None]:
+def site_id_img_2_binary(img) -> np.ndarray:
     """
     This converts an image into black and white color, processes the image to be used for OCR
 
@@ -104,28 +108,29 @@ def site_id_2_binary(img) -> Union[np.ndarray, None]:
         np.ndarray | None: This is the binary form of the input image
     """
     if img is None:
-        logger.error("Invalid Site Id Image")
-        return None
+        logger.error("invalid site id image")
+        raise InvalidImageException('invalid site id image')
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    lower = np.array([0, 38, 120])
-    upper = np.array([179, 255, 255])
+    lower = np.array(HSV_LOWER)
+    upper = np.array(HSV_UPPER)
     mask = cv2.inRange(hsv, lower, upper)
-    mask = cv2.resize(mask, None, fx=3, fy=3, interpolation=cv2.INTER_LINEAR)
+    mask = cv2.resize(mask, None, fx=OCR_UPSCALE, fy=OCR_UPSCALE, interpolation=cv2.INTER_LINEAR)
     return mask
 
-def get_site_id_from_image(image_path: Union[str, Path, np.ndarray], node_bbox) -> Union[None, np.ndarray]:
+def crop_site_id_from_image(image_path: Union[str, Path, np.ndarray], node_bbox) -> dict:
     """
-    Crops the site ID from a node image and performs OCR.
+    Crops a nodes' site ID from the topology image
     Args:
         image_path (str): The path to the full topology image.
         node_bbox (list): Bounding box of the detected node in the format [x_min, y_min, x_max, y_max].
 
     Returns:
-        np.ndarray | None : The Site ID from the image or String 'out of bounds' if its out of bounds of image, or None if image does not exist or is invalid.
+        dict: The dictionary containing the cropped site_id image and error None or site_id None and error description if image does not exist or is invalid or any other error.
     """
     # Load the image
     img = None
+    result = {}
 
     if isinstance(image_path, (str, Path)):
         img = cv2.imread(str(image_path))
@@ -133,42 +138,49 @@ def get_site_id_from_image(image_path: Union[str, Path, np.ndarray], node_bbox) 
         img = image_path
 
     if img is None:
-        logger.error(f"Could not load image")
-        return None
+        result['site_id_image'] = None
+        result['code'] = IMAGE.EMPTY_INPUT_IMAGE
+        result['error'] = IMAGE.EMPTY_INPUT_IMAGE.value
+        return result
 
     x_min, y_min, x_max, y_max = [int(coord) for coord in node_bbox]
 
     if y_min < y_max and x_min < x_max:
-        detected_image = img[y_min:y_max, x_min:x_max]
+        pass
+        #detected_image = img[y_min:y_max, x_min:x_max]
     else:
-        logger.warning("Detected object region is out of bounds or invalid.")
-        return None
+        result['site_id_image'] = None
+        result['code'] = IMAGE.OUT_OF_BOUNDS
+        result['error'] = IMAGE.OUT_OF_BOUNDS.value
+        return result
 
-    row_start_raw = y_max + 1
-    row_end_raw = row_start_raw + 22
-    col_start_raw = x_min - 30
-    col_end_raw = x_max - 1
-
-    row_start = row_start_raw
-    row_end = row_end_raw
-    col_start = col_start_raw
-    col_end = col_end_raw
+    row_start = y_max + LABEL_DY_TOP
+    row_end = row_start + LABEL_HEIGHT
+    col_start = x_min - LABEL_DX_LEFT
+    col_end = x_max - LABEL_DX_RIGHT
 
     img_height, img_width = img.shape[:2]
     if (0 <= row_start < img_height and 0 <= row_end <= img_height and 0 <= col_start < img_width and 0 <= col_end <= img_width and
     row_start < row_end and col_start < col_end):
         site_id_image = img[row_start:row_end, col_start:col_end]
     else:
-        logger.warning("Site ID region is out of bounds or invalid.")
-        return None
+        result['site_id_image'] = None
+        result['code'] = IMAGE.OUT_OF_BOUNDS
+        result['error'] = IMAGE.OUT_OF_BOUNDS.value
+        return result
 
     if site_id_image.size == 0:
-        logger.warning("Cropped image is empty. Bounding box may be invalid.")
-        return None
+        result['site_id_image'] = None
+        result['code'] = IMAGE.EMPTY_CROPED_IMAGE
+        result['error'] = IMAGE.EMPTY_CROPED_IMAGE.value
+        return result
 
-    return site_id_image
+    result['site_id_image'] = site_id_image
+    result['code'] = None
+    result['error'] = None
+    return result
 
-def get_site_id_from_node(image_path: Union[str, Path, np.ndarray], node_bbox) -> str | None:
+def get_site_id_from_node(image_path: Union[str, Path, np.ndarray], node_bbox) -> dict:
     """
     Crops the site ID from a node image and performs OCR.
     Args:
@@ -176,16 +188,31 @@ def get_site_id_from_node(image_path: Union[str, Path, np.ndarray], node_bbox) -
         node_bbox (list): Bounding box of the detected node in the format [x_min, y_min, x_max, y_max].
 
     Returns:
-        str | None: The extracted site ID, or None if OCR fails.
+        dict: A dictionary containing the extracted site id text, error None or site id None and error message if OCR fails or errors occured
     """
-    site_id_image = get_site_id_from_image(image_path, node_bbox)
+    result = {}
+    data = crop_site_id_from_image(image_path, node_bbox)
+    site_id_image = data['site_id_image']
 
     if site_id_image is None or site_id_image.size == 0:
-        return 'invalid'
+        result['site_id'] = None
+        result['code'] = data['code']
+        result['error'] = data['error']
+        return result
 
-    site_id_binary_image = site_id_2_binary(site_id_image)
-    txt = extract_text(site_id_binary_image)
-    return txt
+    site_id_binary_image = site_id_img_2_binary(site_id_image)
+    text_result = extract_text(site_id_binary_image)
+
+    if text_result['code'] is None:
+        result['code'] = None
+        result['error'] = None
+        result['site_id'] = text_result['text']
+        return result
+    else:
+        result['code'] = text_result['code']
+        result['error'] = text_result['error']
+        result['site_id'] = None
+        return result
 
 def get_class_name(result, c_id) -> str | None:
     """
@@ -250,7 +277,7 @@ def create_edges_tensor(edges: list, node_centers: list) -> dict:
         dict: Dictionary containing edge index (connective lines in topology image) and edge attributes
     """
     if len(node_centers) == 0:
-        logger.warning("No node centers provided, cannot create edges.")
+        logger.warning("No node centers provided, returning empty edge tensors")
         return {
             'edge_index': torch.empty((2, 0), dtype=torch.long).contiguous().to(DEVICE),
             'edge_attr': torch.empty((0, 6), dtype=torch.float).to(DEVICE)
@@ -328,10 +355,13 @@ def extract_data_from_YOLO(result: list, img: Union[str, Path, np.ndarray]) -> l
             x_min, y_min, x_max, y_max = boxes.xyxy[key].cpu().detach().numpy().tolist()
             edge = {'color': color, 'endpoints': [(x_min, y_min), (x_max, y_max)]}
             edges.append(edge)
-        elif any(class_name.startswith(p) for p in NODE_TYPE):
+        elif any(class_name.startswith(node) for node in NODE_TYPE):
             node_type = class_name.split('_')[0]
-            site_id = get_site_id_from_node(image_path=img, node_bbox=bbox)
-            if site_id == 'invalid' or not site_id:
+            data = get_site_id_from_node(image_path=img, node_bbox=bbox)
+            site_id = data['site_id']
+            error = data['error']
+            if data['code'] is not None:
+                logger.warning(error)
                 continue
             node = {'id': site_id, 'type': node_type, 'color': color, 'center': center}
             nodes.append(node)
