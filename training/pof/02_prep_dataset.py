@@ -9,12 +9,12 @@ import logging
 from pathlib import Path
 import torch
 from torch_geometric.data import Data
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from core.utils import helpers as utils
-from core.utils.pof import IMGSZ, FUZZY_PERCENTAGE, CONF_LEVEL, DEVICE
+from core.utils.constants import IMGSZ, DEVICE, FUZZY_PERCENTAGE 
 from core.utils.helpers import get_base_path
 
 PROJECT_ROOT = get_base_path()

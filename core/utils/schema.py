@@ -8,7 +8,7 @@ import base64
 import binascii
 import uuid
 from uuid import UUID   
-from pydantic import BaseModel, field_validator, PrivateAttr, model_validator, computed_field
+from pydantic import BaseModel, field_validator, PrivateAttr, model_validator
 from pydantic_core import PydanticCustomError
 from datetime import datetime
 

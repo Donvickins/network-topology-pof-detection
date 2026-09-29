@@ -2,6 +2,7 @@ import torch
 import yaml
 import logging
 from core.utils.paths import get_base_path
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,10 @@ def safe_langs(value, fallback, msg=None) -> list:
 
     return value
 
+def safe_path(path: str, fallback: str) -> Path:
+    return Path(path) if Path(path).is_relative_to(get_base_path()) else fallback
+
+    
 config = {}
 config_path = get_base_path() / 'config.yaml'
 try:
@@ -63,6 +68,7 @@ raw_device = str(config.get('model', {}).get('device', 'cuda')).lower()
 DEVICE = ('cuda' if torch.cuda.is_available() else 'cpu') if (raw_device not in device_options or raw_device == 'auto') else raw_device
 
 MAX_DIST_THRESH = safe_int(config.get('thresholds', {}).get('max_dist_thresh', 50), 50)
+FUZZY_PERCENTAGE = safe_int(config.get('thresholds', {}).get('fuzzy_percentage', 70), 70)
 HSV_UPPER = safe_hsv(config.get('thresholds', {}).get('hsv_upper', [179, 255, 255]), [179, 255, 255], "invalid hsv input, using defaults")
 HSV_LOWER = safe_hsv(config.get('thresholds', {}).get('hsv_lower', [0, 38, 120]), [0, 38, 120], "invalid hsv input, using defaults")
 
@@ -73,6 +79,8 @@ langs = config.get('tesseract', {}).get('langs', ['pof_ocr', 'eng'])
 TESS_LANGS = safe_langs(langs, ['pof_ocr', 'eng'], 'Invalid language in config, using defaults')
 TESS_CHARSET = config.get('tesseract', {}).get('charset', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_')
 OCR_UPSCALE = safe_float(config.get('tesseract', {}).get('ocr_upscale', 3.0), 3.0)
+
+SAVE_DIR = safe_path(config.get('inference', {}).get('save_dir', 'workspace/received_images'), 'workspace/received_images')
 
 LABEL_DY_TOP = 1
 LABEL_HEIGHT = 22

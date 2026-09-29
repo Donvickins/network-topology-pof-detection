@@ -4,14 +4,15 @@ import cv2
 import sys
 import torch
 import shutil
+import os
 import numpy as np
 from scipy.spatial.distance import cdist
 from typing import Union
 from pathlib import Path
 from rapidfuzz import fuzz
 from core.utils.exception_handler import InvalidImageException
-from core.utils.node_type_config import NODE_TYPE, COLOR_MAP, FUZZY_PERCENTAGE
-from core.utils.constants import DEVICE, TESS_OEM, TESS_PSM, TESS_CHARSET, MAX_DIST_THRESH, HSV_LOWER, HSV_UPPER, OCR_UPSCALE, TESS_LANGS, LABEL_DY_TOP, LABEL_HEIGHT, LABEL_DX_LEFT, LABEL_DX_RIGHT
+from core.utils.node_type_config import NODE_TYPE, COLOR_MAP
+from core.utils.constants import DEVICE, TESS_OEM, TESS_PSM, TESS_CHARSET, MAX_DIST_THRESH, FUZZY_PERCENTAGE, HSV_LOWER, HSV_UPPER, OCR_UPSCALE, TESS_LANGS, LABEL_DY_TOP, LABEL_HEIGHT, LABEL_DX_LEFT, LABEL_DX_RIGHT
 from core.utils.enums import OCR, IMAGE
 from core.utils.paths import get_base_path
 
@@ -231,6 +232,26 @@ def get_class_name(result, c_id) -> str | None:
     return None
 
 
+def match_down_id(down_id: str, node_ids: list) -> list:
+    """
+    Scores every node id against down_id, returns matches >= FUZZY_PERCENTAGE best-first.
+    Single source of fuzzy-match truth for is_down flags and down-site resolution.
+
+    Returns:
+        list: [{'score': int, 'id': str}], sorted by score descending.
+    """
+    if not down_id:
+        return []
+    matches = [
+        {'score': fuzz.ratio(down_id, node_id), 'id': node_id}
+        for node_id in node_ids
+    ]
+    return sorted(
+        (m for m in matches if m['score'] >= FUZZY_PERCENTAGE),
+        key=lambda m: m['score'], reverse=True,
+    )
+
+
 def create_node_tensor(nodes: list, down_id: str = None) -> dict:
     """
     Create a node features, node centers and node ids from YOLO Detections
@@ -248,9 +269,10 @@ def create_node_tensor(nodes: list, down_id: str = None) -> dict:
     node_features = []
     node_centers = []
     node_ids = []
+    matched_ids = {m['id'] for m in match_down_id(down_id, [n['id'] for n in nodes])}
     for node in nodes:
         feature = TYPE_MAP.get(node['type']) + COLOR_MAP.get(node['color'])
-        is_down = 1 if down_id and fuzz.ratio(down_id, node['id']) >= FUZZY_PERCENTAGE else 0
+        is_down = 1 if node['id'] in matched_ids else 0
         feature.append(is_down)
         node_centers.append(node['center'])
         node_ids.append(node['id'])
@@ -408,6 +430,10 @@ def move_and_merge(src: Path, dst: Path):
                     shutil.move(str(src_path), str(dst_path))
                 except PermissionError as e:
                     logger.error(f"Permission denied to move file {src_path} to {dst_path}. The file might be in use. Error: {e}")
+
+
+def is_demo_mode():
+    return True if os.getenv('POF_MODEL_SOURCE', 'live') == 'demo' else False
 
 if __name__ == '__main__':
     sys.exit(0)

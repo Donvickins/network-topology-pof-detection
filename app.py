@@ -1,6 +1,9 @@
+import sys
+
+sys.dont_write_bytecode = True
+
 import uvicorn
 import os
-import sys
 import logging
 from logging.config import dictConfig
 from colorama import just_fix_windows_console
@@ -26,7 +29,6 @@ if __name__ == '__main__':
 
         logging.getLogger("").critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
-    # Assign the custom handler to the system's exception hook
     sys.excepthook = handle_uncaught_exception
 
     uvicorn.run(

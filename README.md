@@ -44,8 +44,8 @@ standalone **Windows desktop executable** via Nuitka.
   uncertain.
 - **Custom OCR**: a purpose-trained Tesseract language model plus HSV color
   masking for reliable site-ID extraction.
-- **Fault-tolerant matching**: fuzzy string matching (`fuzzywuzzy`, threshold 70)
-  aligns user-supplied site IDs to OCR output.
+- **Fault-tolerant matching**: fuzzy string matching (`rapidfuzz`, threshold 70,
+  set in `config.yaml`) aligns user-supplied site IDs to OCR output.
 - **Deployable as service or desktop app**: FastAPI + uvicorn, or a packaged
   Windows `.exe`.
 
@@ -95,12 +95,17 @@ Stage-by-stage:
 ├── requirements.txt
 ├── core/
 │   ├── api.py                 # FastAPI routes (POST /pof, GET /health)
+│   ├── demo.py                # Demo mode: hardcoded detections + random GNN
+│   │                          # (used only when POF_MODEL_SOURCE=demo)
 │   ├── gnn/
 │   │   └── model.py           # GATv2 GNN architecture (dual-head)
 │   └── utils/
 │       ├── helpers.py         # YOLO result parsing, graph/tensor construction
 │       ├── pof.py             # Core business logic: model prep + inference
 │       ├── schema.py          # Pydantic request/response models
+│       ├── constants.py       # Settings loaded from config.yaml
+│       ├── paths.py           # Finds the project folder (script or .exe)
+│       ├── enums.py           # Fixed error messages for OCR/image failures
 │       ├── node_type_config.py# Node-type and color → feature mappings
 │       ├── exception_handler.py
 │       └── logger_config.py   # Rotating-file + console logging
@@ -122,7 +127,7 @@ Stage-by-stage:
 | Detection     | Ultralytics YOLOv8 (instance segmentation)               |
 | OCR           | Tesseract (custom `pof_ocr` model), OpenCV (HSV masking) |
 | Graph ML      | PyTorch, PyTorch Geometric (GATv2Conv, LayerNorm)        |
-| Matching      | fuzzywuzzy / python-Levenshtein                          |
+| Matching      | rapidfuzz                                    |
 | Packaging     | Nuitka (standalone Windows `.exe`)                       |
 
 ## Getting Started
@@ -148,7 +153,32 @@ pip install -r requirements.txt
 python app.py
 ```
 
-_The server will refuse to start if the model files are missing._
+_The server always starts, even without model files. If the models are
+missing, it runs in a limited state: `/health` reports `degraded` and
+`/pof` answers `503 Models not available`. All thresholds and model
+settings live in `config.yaml`._
+
+### Try it without models (demo mode)
+
+No weights needed. The server uses hardcoded detections and a random
+graph model instead of the real ones, so the answer is an example only,
+not a real prediction:
+
+```bash
+# 1. Start the server in demo mode
+POF_MODEL_SOURCE=demo python app.py
+
+# 2. Check it is running
+curl localhost:5500/health
+# {"status": "degraded", "environment": "demo"}
+
+# 3. Send the bundled sample image with site_id DEMO1
+#    (file created on first demo boot at
+#    workspace/samples/demo_topology.png)
+```
+
+Upload the sample file to `POST /pof` with `"site_id": "DEMO1"`.
+You get back a full example response with `pof` set to `DEMO1`.
 
 ## API Reference
 
@@ -190,12 +220,18 @@ percentage.
 - Invalid image (undecodable, or no nodes detected)
 - No `site_id` provided
 - `site_id` not found in the image (no fuzzy match ≥ 70%)
+- Models not loaded (server running without model files → `503`)
 
 ### `GET /health`
 
+Shows whether the server can make predictions:
+
 ```json
-{ "message": "OK" }
+{ "status": "ready", "environment": "live" }
 ```
+
+`status` is `ready` when models are loaded, `degraded` when they are not.
+`environment` is `live` or `demo`.
 
 ## Training Pipeline
 

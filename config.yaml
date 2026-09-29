@@ -1,11 +1,12 @@
 model:
   num_node_features: 12
   imgsz: 1280
-  device: cuda # or cpu or auto
+  device: auto # cpu, cuda or auto
 
 thresholds:
   conf_level: 0.1
   max_dist_thresh: 50
+  fuzzy_percentage: 70
   hsv_upper: [179, 255, 255]
   hsv_lower: [0, 38, 120]
 
@@ -15,3 +16,6 @@ tesseract:
   langs: [pof_ocr, eng]
   charset: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_
   ocr_upscale: 3.0
+
+inference:
+  save_dir: workspace/received_images
