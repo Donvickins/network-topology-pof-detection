@@ -149,7 +149,7 @@ pip install -r requirements.txt
 #    models/GNN/best.pt
 #    and make the custom 'pof_ocr' Tesseract model available
 
-# 4. Run the API server (host 0.0.0.0, port 5500)
+# 4. Run the API server (default http://127.0.0.1:5500, see config.yaml)
 python app.py
 ```
 
@@ -157,6 +157,9 @@ _The server always starts, even without model files. If the models are
 missing, it runs in a limited state: `/health` reports `degraded` and
 `/pof` answers `503 Models not available`. All thresholds and model
 settings live in `config.yaml`._
+
+_Requests are limited to 15 MB bodies and images up to 4500px per side.
+Requests running longer than 25 seconds are stopped with a `504`._
 
 ### Try it without models (demo mode)
 
@@ -179,6 +182,25 @@ curl localhost:5500/health
 
 Upload the sample file to `POST /pof` with `"site_id": "DEMO1"`.
 You get back a full example response with `pof` set to `DEMO1`.
+
+## Security Notes
+
+This app has **no login, no rate limiting, and no browser rules (CORS) of
+its own — on purpose**. It is protected one level up: the company
+firewall and the network team decide who can reach it. It must never face
+the open Internet as it is.
+
+That deal breaks if any of these change — each one reopens real security
+work on the app itself:
+
+- the server leaves the protected network (for example a laptop working
+  outside the VPN);
+- the firewall rule changes;
+- anyone off the network ever needs to call it.
+
+Also note: anyone *inside* the allowed network can use it freely, and the
+request limits above (body size, image size, 25-second timeout) are about
+stability, not keeping attackers out.
 
 ## API Reference
 

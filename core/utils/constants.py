@@ -91,6 +91,9 @@ MAX_BODY_SIZE_MB = safe_int(config.get('server', {}).get('max_body_size_mb', 15)
 MAX_IMAGE_PX = safe_int(config.get('server', {}).get('max_image_px', 4500), 4500)
 SAVE_RECEIVED_IMAGES = safe_bool(config.get('server', {}).get('save_received_images', True), True)
 
+REQUEST_TIMEOUT_S = safe_int(config.get('server', {}).get('request_timeout_s', 25), 25)
+HOST = config.get('server', {}).get('host', '127.0.0.1')
+PORT = safe_int(config.get('server', {}).get('port', 5500), 5500)
 
 LABEL_DY_TOP = 1
 LABEL_HEIGHT = 22

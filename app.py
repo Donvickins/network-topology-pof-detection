@@ -7,17 +7,20 @@ import os
 import logging
 from logging.config import dictConfig
 from colorama import just_fix_windows_console
+from core.utils.constants import HOST, PORT
 
 # Suppress Ultralytics' initial setup logs
 os.environ['ULTRALYTICS_LOGGING'] = 'CRITICAL'
 
 from core.utils.logger_config import LOG_CONFIG
+from core.utils.logger_config import ensure_logs_dir
 
 if __name__ == '__main__':
     if sys.platform == 'win32':
         just_fix_windows_console()
         
     dictConfig(LOG_CONFIG)
+    ensure_logs_dir()
     def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
         """
         Global handler for uncaught exceptions that logs the exception
@@ -33,7 +36,7 @@ if __name__ == '__main__':
 
     uvicorn.run(
         "core.api:app",
-        host="0.0.0.0",
-        port=5500,
+        host=HOST,
+        port=PORT,
         log_config=LOG_CONFIG
     )

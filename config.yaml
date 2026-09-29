@@ -24,3 +24,6 @@ server:
   max_body_size_mb: 15
   max_image_px: 4500
   save_received_images: true
+  request_timeout_s: 25
+  host: 127.0.0.1
+  port: 5500

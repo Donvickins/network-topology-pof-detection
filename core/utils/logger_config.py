@@ -6,7 +6,9 @@ logs_dir = get_base_path() / 'logs'
 log_file = logs_dir / 'app.log'
 error_log_file = logs_dir / 'error.log'
 
-if not logs_dir.exists():
+
+def ensure_logs_dir() -> None:
+    """Creates the logs dir. Called once at server startup, never at import."""
     logs_dir.mkdir(parents=True, exist_ok=True)
 
 LOG_CONFIG = {
