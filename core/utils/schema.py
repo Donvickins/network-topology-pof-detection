@@ -6,11 +6,16 @@ If the format is not in the schema described here the program will throw an erro
 
 import base64
 import binascii
+import io
 import uuid
-from uuid import UUID   
+import re
+from uuid import UUID
+from PIL import Image
 from pydantic import BaseModel, field_validator, PrivateAttr, model_validator
 from pydantic_core import PydanticCustomError
 from datetime import datetime
+from core.utils.enums import VALIDATION
+from core.utils.constants import MAX_IMAGE_PX
 
 class Request(BaseModel):
     site_id: str
@@ -20,32 +25,38 @@ class Request(BaseModel):
     @classmethod
     def validate_base64_image(cls, v):
         if not v or not v.strip():
-            raise PydanticCustomError('empty_value', "base64 image must not be empty")
+            raise PydanticCustomError(VALIDATION.EMPTY_FIELD.name, VALIDATION.EMPTY_FIELD.value)
         try:
-            base64.b64decode(v, validate=True)
-            return v
+            raw = base64.b64decode(v, validate=True)
         except binascii.Error:
-            raise PydanticCustomError('invalid_base64', "Invalid base64 string")
+            raise PydanticCustomError(VALIDATION.INVALID_IMAGE.name, VALIDATION.INVALID_IMAGE.value)
+        try:
+            with Image.open(io.BytesIO(raw)) as pil:
+                if max(pil.size) > MAX_IMAGE_PX:
+                    raise PydanticCustomError(VALIDATION.IMAGE_TOO_LARGE.name, VALIDATION.IMAGE_TOO_LARGE.value)
+        except PydanticCustomError:
+            raise
+        except Exception:
+            raise PydanticCustomError(VALIDATION.INVALID_IMAGE.name, VALIDATION.INVALID_IMAGE.value)
+        return v
 
     @field_validator('site_id', 'order_id', mode='after')
     @classmethod
-    def validate_site_id(cls, v: str) -> str:
-        if not v or not v.strip():
+    def validate_site_id(cls, value: str) -> str:
+        if not value or not value.strip():
             raise PydanticCustomError(
-                "empty_value",
-                "site_id must not be empty"
+                VALIDATION.EMPTY_FIELD.name,
+                "id must not be empty"
             )
-        return v
+        
+        pattern = r'^[A-Za-z0-9_-]{1,64}$'
+        if not re.fullmatch(pattern, value):
+            raise PydanticCustomError(
+                VALIDATION.INVALID_ID.name,
+                VALIDATION.INVALID_ID.value
+            )
+        return value
 
-    @field_validator('order_id', mode='after')
-    @classmethod
-    def validate_order_id(cls, v: str) -> str:
-        if not v or not v.strip():
-            raise PydanticCustomError(
-                "empty_value",
-                "order_id must not be empty"
-            )
-        return v
 
 class Response(BaseModel):
     site_id: str

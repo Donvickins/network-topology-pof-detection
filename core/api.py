@@ -12,11 +12,12 @@ from fastapi import FastAPI, status, Request
 from core.utils.schema import Request as pofRequest, Response as pofResponse
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from starlette.middleware.body_limit import RequestBodyLimitMiddleware
 from core.utils.pof import pof, prep_models
-from core.utils.paths import get_base_path
+from core.utils.storage import save_received_image
 from core.utils.helpers import is_demo_mode
 from core.utils.exception_handler import InvalidImageException, SiteIdNotFoundInImage, NoSiteId
-from core.utils.constants import SAVE_DIR
+from core.utils.constants import SAVE_RECEIVED_IMAGES, MAX_BODY_SIZE_MB
 from core.demo import load_demo_models
 from contextlib import asynccontextmanager
 
@@ -32,15 +33,12 @@ async def lifespan(app: FastAPI):
     else:
         app.state.models = prep_models(yolo_model_path, gnn_model_path)
 
-    save_dir = get_base_path() / SAVE_DIR
-    save_dir.mkdir(exist_ok=True, parents=True)
-    app.state.save_dir = save_dir
-
     yield
 
     logger.info('Shutting down server...')
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(RequestBodyLimitMiddleware, max_body_size=MAX_BODY_SIZE_MB * 1024 * 1024)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_: Request, exc: RequestValidationError):
@@ -91,7 +89,6 @@ async def check_pof(body: pofRequest, http_request: Request):
         if models is None:
             return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content={'status': 'error', 'message': 'Models not available, try again later'})
                 
-        save_dir = http_request.app.state.save_dir
         yolo_model, gnn_model = models
         
         predicted_pof, accuracy = pof(image_bytes,body.site_id,yolo_model, gnn_model)
@@ -99,12 +96,8 @@ async def check_pof(body: pofRequest, http_request: Request):
         accuracy = round(accuracy, 2)
 
         #chore: sanitize this image
-        try:
-            image_path = save_dir / f'{body.order_id}.png'
-            with open(image_path, 'wb') as file:
-                file.write(image_bytes)
-        except Exception as e:
-            logger.error(f'Failed to save image for order id: {body.order_id}. Reason: {e}')
+        if SAVE_RECEIVED_IMAGES:
+            save_received_image(image_bytes, body.order_id)
 
     except (NoSiteId, InvalidImageException, SiteIdNotFoundInImage):
         raise

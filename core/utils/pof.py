@@ -4,16 +4,18 @@ This contains the business logic of the application. This is where the 3 models 
 
 import logging
 import sys
+import io
 import cv2
 import torch
 import numpy as np
 from typing import Tuple, Union
 from pathlib import Path
+from PIL import Image
 from ultralytics import YOLO
 from core.utils import helpers as utils
 from core.gnn.model import GNN
 from core.utils.exception_handler import InvalidImageException, SiteIdNotFoundInImage, NoSiteId
-from core.utils.constants import DEVICE, NUM_NODE_FEATURES, CONF_LEVEL, IMGSZ
+from core.utils.constants import DEVICE, NUM_NODE_FEATURES, CONF_LEVEL, IMGSZ, MAX_IMAGE_PX
 
 logger = logging.getLogger(__name__)
 
@@ -130,9 +132,19 @@ def pof(image, down_id: str, yolo_model, gnn_model) -> Tuple[str, float]:
         logger.error('Empty or invalid site ID')
         raise NoSiteId('Empty or invalid site ID')
 
-    image = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
+    try:
+        with Image.open(io.BytesIO(image)) as pil:
+            if max(pil.size) > MAX_IMAGE_PX:
+                logger.error(f'Image dimensions {pil.size} exceed {MAX_IMAGE_PX}px limit')
+                raise InvalidImageException(f'Image dimensions exceed {MAX_IMAGE_PX}px limit')
+            image = cv2.cvtColor(np.array(pil.convert('RGB')), cv2.COLOR_RGB2BGR)
+    except InvalidImageException:
+        raise
+    except Exception:
+        logger.error('Invalid image')
+        raise InvalidImageException('Image is not valid')
 
-    if image is None or image.size == 0:
+    if image.size == 0:
         logger.error('Invalid image')
         raise InvalidImageException('Image is not valid')
 

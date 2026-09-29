@@ -19,3 +19,8 @@ tesseract:
 
 inference:
   save_dir: workspace/received_images
+
+server:
+  max_body_size_mb: 15
+  max_image_px: 4500
+  save_received_images: true

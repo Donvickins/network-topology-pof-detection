@@ -9,3 +9,9 @@ class IMAGE(Enum):
     OUT_OF_BOUNDS = 'Site id is out of bounds or invalid'
     EMPTY_INPUT_IMAGE = 'Image is empty or invalid'
     EMPTY_CROPED_IMAGE = 'Cropped site id image is empty'
+
+class VALIDATION(Enum):
+    EMPTY_FIELD = 'empty field'
+    INVALID_IMAGE = 'invalid base64 image'
+    IMAGE_TOO_LARGE = 'image dimensions exceed allowed limit'
+    INVALID_ID = 'invalid ID format'
