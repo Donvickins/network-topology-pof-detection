@@ -3,6 +3,9 @@ from pathlib import Path
 
 import torch
 import yaml
+import ipaddress
+import re
+import os
 
 from core.utils.paths import get_base_path
 
@@ -51,6 +54,20 @@ def safe_bool(value, fallback: bool):
     if isinstance(value, bool):
         return value
     return fallback
+
+def safe_string(value: str, fallback:str) -> str:
+    pattern = r'^[A-Za-z_-.]{1,128}$'
+    if not re.fullmatch(pattern, value):
+        return fallback
+    return value
+
+def safe_ip(value:str, fallback: str) -> str:
+    try:
+        value = str(ipaddress.ip_address(value))
+    except:
+        return fallback
+
+    return value
     
 config = {}
 config_path = get_base_path() / 'config.yaml'
@@ -92,8 +109,10 @@ MAX_IMAGE_PX = safe_int(config.get('server', {}).get('max_image_px', 4500), 4500
 SAVE_RECEIVED_IMAGES = safe_bool(config.get('server', {}).get('save_received_images', True), True)
 
 REQUEST_TIMEOUT_S = safe_int(config.get('server', {}).get('request_timeout_s', 25), 25)
-HOST = config.get('server', {}).get('host', '127.0.0.1')
+HOST = safe_ip(config.get('server', {}).get('host', '127.0.0.1'), '127.0.0.1')
 PORT = safe_int(config.get('server', {}).get('port', 5500), 5500)
+ENFORCE_HTTPS = safe_bool(config.get('server', {}).get('enforce_https', False), False)
+BEARER_TOKEN = os.getenv('BEARER_TOKEN')
 
 LABEL_DY_TOP = 1
 LABEL_HEIGHT = 22

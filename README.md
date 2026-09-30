@@ -92,30 +92,39 @@ Stage-by-stage:
 .
 ├── app.py                     # Entry point: boots the FastAPI/uvicorn server
 ├── build.py                   # Nuitka Windows standalone build script
-├── requirements.txt
+├── test.py                    # Manual test script
+├── pyproject.toml             # Deps source of truth (uv sync --extra cpu|cuda)
+├── uv.lock                    # locked deps
+├── config.yaml                # Thresholds, model and server settings
+├── Fix.md                     # Code-review risk log
 ├── core/
 │   ├── api.py                 # FastAPI routes (POST /pof, GET /health)
 │   ├── demo.py                # Demo mode: hardcoded detections + random GNN
 │   │                          # (used only when POF_MODEL_SOURCE=demo)
+│   ├── middleware.py          # Request timeout (504)
 │   ├── gnn/
 │   │   └── model.py           # GATv2 GNN architecture (dual-head)
 │   └── utils/
+│       ├── auth.py            # Bearer check (POST /pof only)
 │       ├── helpers.py         # YOLO result parsing, graph/tensor construction
 │       ├── pof.py             # Core business logic: model prep + inference
 │       ├── schema.py          # Pydantic request/response models
-│       ├── constants.py       # Settings loaded from config.yaml
+│       ├── storage.py         # Received-image save (png, uuid, containment)
+│       ├── constants.py       # Settings loaded from config.yaml + env
 │       ├── paths.py           # Finds the project folder (script or .exe)
 │       ├── enums.py           # Fixed error messages for OCR/image failures
 │       ├── node_type_config.py# Node-type and color → feature mappings
-│       ├── exception_handler.py
+│       ├── exception_handler.py # Typed domain exceptions
 │       └── logger_config.py   # Rotating-file + console logging
 ├── training/
-│   ├── yolo/                  # YOLO dataset prep, CVAT export, trainers, ONNX
-│   ├── pof/                   # GNN dataset prep + graph trainer
-│   └── ocr/                   # OCR dataset prep
-├── cvat_config/               # CVAT label configuration
-├── models/                    # (stripped) best.pt for YOLO and GNN
-├── workspace/                 # classes.txt; received_images/ created at runtime
+│   ├── yolo/                  # auto_anotate, bbox_2_seg, merge_segbbox_2_existing_seg,
+│   │                          # export_to_cvat, trainer, trainer_colab, pt_to_onnx
+│   ├── pof/                   # 01_create_txt_for_images, 02_prep_dataset, 03_gnn_trainer
+│   └── ocr/                   # prep_ocr_dataset (+ README)
+├── cvat_config/               # classes_raw.txt label configuration
+├── models/                    # (stripped) YOLO/ and GNN/ best.pt
+├── workspace/                 # classes.txt; received_images/ + samples/ created at runtime
+├── logs/                      # app.log + error.log (created at startup)
 └── icon/                      # Windows application icon
 ```
 
@@ -123,7 +132,7 @@ Stage-by-stage:
 
 | Layer         | Technology                                               |
 | ------------- | -------------------------------------------------------- |
-| API / Service | Python, FastAPI, uvicorn                                 |
+| API / Service | Python, FastAPI, uvicorn, fastapi-guard (rate limiting, pen detection, IP banning) |
 | Detection     | Ultralytics YOLOv8 (instance segmentation)               |
 | OCR           | Tesseract (custom `pof_ocr` model), OpenCV (HSV masking) |
 | Graph ML      | PyTorch, PyTorch Geometric (GATv2Conv, LayerNorm)        |
@@ -137,29 +146,33 @@ Stage-by-stage:
 > predictions (see the [training pipeline](#training-pipeline)).
 
 ```bash
-# 1. Create and activate a Python virtual environment
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+# 1. Install uv (https://docs.astral.sh/uv/), then sync dependencies.
+#    CPU is the default path; GPU boxes use --extra cuda instead.
+uv sync --extra cpu        # CPU (all systems)
+# uv sync --extra cuda     # NVIDIA GPU on Linux/Windows (cu126);
+                           # falls back to CPU wheels on macOS
 
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. (Required) Place the trained models at:
+# 2. (Required) Place the trained models at:
 #    models/YOLO/best.pt
 #    models/GNN/best.pt
 #    and make the custom 'pof_ocr' Tesseract model available
 
-# 4. Run the API server (default http://127.0.0.1:5500, see config.yaml)
-python app.py
+# 3. Run the API server (default http://127.0.0.1:5500, see config.yaml)
+BEARER_TOKEN=<shared-secret> uv run app.py
 ```
 
-_The server always starts, even without model files. If the models are
-missing, it runs in a limited state: `/health` reports `degraded` and
-`/pof` answers `503 Models not available`. All thresholds and model
-settings live in `config.yaml`._
+_The server always starts, even without model files. In live mode it runs
+in a limited state: `/health` reports `degraded` and
+`/pof` answers `503 Models not available`. Demo mode always reports
+`healthy`. All thresholds and model settings live in `config.yaml`._
 
-_Requests are limited to 15 MB bodies and images up to 4500px per side.
-Requests running longer than 25 seconds are stopped with a `504`._
+_Requests are limited to 15 MB bodies (`413`) and images up to 4500px per side
+(`400`)._
+
+_`POST /pof` needs `Authorization: Bearer <token>` matching the server's
+`BEARER_TOKEN` env var. Missing or wrong token → `401`. If the server itself
+has no `BEARER_TOKEN` set, `/pof` answers `503`. `GET /health` needs no
+token._
 
 ### Try it without models (demo mode)
 
@@ -169,15 +182,19 @@ not a real prediction:
 
 ```bash
 # 1. Start the server in demo mode
-POF_MODEL_SOURCE=demo python app.py
+BEARER_TOKEN=demo-token POF_MODEL_SOURCE=demo python app.py
 
-# 2. Check it is running
+# 2. Check it is running (no token needed)
 curl localhost:5500/health
-# {"status": "degraded", "environment": "demo"}
+# {"status": "healthy", "environment": "demo"}
 
-# 3. Send the bundled sample image with site_id DEMO1
+# 3. Send the bundled sample image with site_id DEMO1 (token required)
 #    (file created on first demo boot at
 #    workspace/samples/demo_topology.png)
+curl -X POST localhost:5500/pof \
+  -H "Authorization: Bearer demo-token" \
+  -H "Content-Type: application/json" \
+  -d '{"site_id": "DEMO1", "order_id": "DEMO-1", "image_base64": "<base64...>"}'
 ```
 
 Upload the sample file to `POST /pof` with `"site_id": "DEMO1"`.
@@ -185,28 +202,27 @@ You get back a full example response with `pof` set to `DEMO1`.
 
 ## Security Notes
 
-This app has **no login, no rate limiting, and no browser rules (CORS) of
-its own — on purpose**. It is protected one level up: the company
-firewall and the network team decide who can reach it. It must never face
-the open Internet as it is.
+`POST /pof` is locked with a bearer token. `GET /health` is open.
 
-That deal breaks if any of these change — each one reopens real security
-work on the app itself:
-
-- the server leaves the protected network (for example a laptop working
-  outside the VPN);
-- the firewall rule changes;
-- anyone off the network ever needs to call it.
-
-Also note: anyone *inside* the allowed network can use it freely, and the
-request limits above (body size, image size, 25-second timeout) are about
-stability, not keeping attackers out.
+- Callers send `Authorization: Bearer <token>` on `POST /pof`. The server
+  compares it against its `BEARER_TOKEN` env var with a constant-time
+  check. Missing or wrong token → `401`; server has no `BEARER_TOKEN`
+  set → `503`.
+- Global abuse protection via `fastapi-guard`: 40 requests per 60 seconds,
+  penetration-pattern detection, IP banning (10 strikes → 1200 s ban).
+- Stability limits: 15 MB body (`413`), 4500px image side (`400`), 25 s
+  request timeout (`504`).
+- No CORS: no browser calls this app. It is service-to-service behind the
+  company firewall, so there is nothing for CORS to allow. The firewall and
+  the network team remain the outer layer. It must never face the open
+  Internet as it is.
 
 ## API Reference
 
 ### `POST /pof`
 
-Predicts the point of failure for a topology image.
+Predicts the point of failure for a topology image. Requires
+`Authorization: Bearer <token>` matching the server's `BEARER_TOKEN`.
 
 **Request** — `application/json`:
 
@@ -236,23 +252,16 @@ Predicts the point of failure for a topology image.
 confidence is below 0.5. `certainty` is the prediction probability as a
 percentage.
 
-**Error responses** (`status` set to `error` with a human-readable `message`):
-
-- Invalid or empty base64 image
-- Invalid image (undecodable, or no nodes detected)
-- No `site_id` provided
-- `site_id` not found in the image (no fuzzy match ≥ 70%)
-- Models not loaded (server running without model files → `503`)
-
 ### `GET /health`
 
 Shows whether the server can make predictions:
 
 ```json
-{ "status": "ready", "environment": "live" }
+{ "status": "healthy", "environment": "live" }
 ```
 
-`status` is `ready` when models are loaded, `degraded` when they are not.
+`status` is `healthy` in demo mode. In live mode it is `healthy` when models
+are loaded, `degraded` when they are not.
 `environment` is `live` or `demo`.
 
 ## Training Pipeline

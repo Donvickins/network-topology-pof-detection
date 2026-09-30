@@ -17,7 +17,7 @@ from datetime import datetime
 from core.utils.enums import VALIDATION
 from core.utils.constants import MAX_IMAGE_PX
 
-class Request(BaseModel):
+class POFDTO(BaseModel):
     site_id: str
     order_id: str
     image_base64: str
@@ -58,7 +58,7 @@ class Request(BaseModel):
         return value
 
 
-class Response(BaseModel):
+class POFOUT(BaseModel):
     site_id: str
     order_id: str
     pof: str
@@ -68,7 +68,7 @@ class Response(BaseModel):
     _task_id: UUID = PrivateAttr()
 
     @model_validator(mode='after')
-    def _update_timestamps(self) -> 'Response':
+    def _update_timestamps(self) -> 'POFOUT':
         """
         Initializes or updates timestamps.
         - On first validation, sets created_at, modified_at, and task_id.
@@ -99,3 +99,17 @@ class Response(BaseModel):
     @property
     def task_id(self) -> UUID:
         return self._task_id
+
+
+class ErrorResponse(BaseModel):
+    status: str = 'error'
+    message: str
+    details: list[dict] | None = None
+
+class POFRESPONSE(BaseModel):
+    status: str
+    data: POFOUT
+
+class HEALTHRESPONSE(BaseModel):
+    status: str 
+    environment: str

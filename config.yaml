@@ -27,3 +27,4 @@ server:
   request_timeout_s: 25
   host: 127.0.0.1
   port: 5500
+  enforce_https: false
