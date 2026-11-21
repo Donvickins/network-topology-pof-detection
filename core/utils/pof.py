@@ -9,7 +9,6 @@ import cv2
 import torch
 import numpy as np
 from typing import Tuple, Union
-from pathlib import Path
 from PIL import Image
 from ultralytics import YOLO
 from core.utils import helpers as utils
@@ -173,36 +172,36 @@ def pof(image, down_id: str, yolo_model, gnn_model) -> Tuple[str, float]:
 
     # Create graph tensors
     node_data = utils.create_node_tensor(nodes, down_id)
-    edge_data = utils.create_edges_tensor(edges, node_data['node_centers'])
+    edge_data = utils.create_edges_tensor(edges, node_data.node_centers)
 
     # Validate graph
-    if len(node_data['node_ids']) == 0:
+    if len(node_data.node_ids) == 0:
         logger.error('No valid nodes extracted from image')
         raise InvalidImageException('No valid nodes extracted from image')
 
-    if not isinstance(edge_data['edge_index'], torch.Tensor) or edge_data['edge_index'].shape[0] != 2:
+    if not isinstance(edge_data.edge_index, torch.Tensor) or edge_data.edge_index.shape[0] != 2:
         logger.error(f'Invalid edge_index: {edge_data["edge_index"]}')
         raise InvalidImageException('Invalid edge index')
 
-    if edge_data['edge_index'].size(1) == 0:
+    if edge_data.edge_index.size(1) == 0:
         logger.warning('No valid edges detected in the graph, proceeding with isolated nodes.')
 
     # Fuzzy matching for down_id (single source: utils.match_down_id)
-    matches = utils.match_down_id(down_id, node_data['node_ids'])
+    matches = utils.match_down_id(down_id, node_data.node_ids)
 
     if len(matches) == 0:
         logger.error(f'Site down with ID: "{down_id}" not found in image')
         raise SiteIdNotFoundInImage(f'Site down with ID: "{down_id}" not found in image')
 
-    runner_ups = ", ".join(f"{m['id']} ({m['score']}%)" for m in matches[:3])
+    runner_ups = ", ".join(f"{m.id} ({m.score}%)" for m in matches[:3])
     logger.info(f'down_id "{down_id}" top matches: {runner_ups}')
 
     # Feed extracted nodes and edges to the GNN
     with torch.no_grad():
-        pof_logits, has_pof_logit = gnn_model(node_data['x'], edge_data['edge_index'], edge_data['edge_attr'])
+        pof_logits, has_pof_logit = gnn_model(node_data.x, edge_data.edge_index, edge_data.edge_attr)
 
     # Interpret predictions
-    return interpret_pof_predictions(pof_logits, has_pof_logit, node_data['node_ids'])
+    return interpret_pof_predictions(pof_logits, has_pof_logit, node_data.node_ids)
 
 if __name__ == "__main__":
     sys.exit(0)

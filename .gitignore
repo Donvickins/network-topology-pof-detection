@@ -1,6 +1,6 @@
 **/*build*
 **/*dist*
-**/*test*
+!tests
 !build.py
 .vscode/
 .venv

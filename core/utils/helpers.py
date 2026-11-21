@@ -13,7 +13,7 @@ from rapidfuzz import fuzz
 from core.utils.exception_handler import InvalidImageException
 from core.utils.node_type_config import NODE_TYPE, COLOR_MAP
 from core.utils.constants import DEVICE, TESS_OEM, TESS_PSM, TESS_CHARSET, MAX_DIST_THRESH, FUZZY_PERCENTAGE, HSV_LOWER, HSV_UPPER, OCR_UPSCALE, TESS_LANGS, LABEL_DY_TOP, LABEL_HEIGHT, LABEL_DX_LEFT, LABEL_DX_RIGHT
-from core.utils.enums import OCR, IMAGE
+from core.utils.types import OCR, IMAGE, TextResult, CropSiteIdResult, SiteIdResult, NodeData, EdgeData, DownIdMatchResult
 from core.utils.paths import get_base_path
 
 logger = logging.getLogger(__name__)
@@ -36,10 +36,10 @@ def _configure_tesseract() -> None:
     if tesseract_path.is_file():
         pytesseract.pytesseract.tesseract_cmd = str(tesseract_path)
     else:
-        logger.warning(f"Bundled Tesseract not found at '{tesseract_path}'. Falling back to system PATH.")
+        logger.warning(f"Bundled Tesseract not found. Falling back to system. Please ensure Tesseract is installed and in your PATH.")
     _tesseract_configured = True
 
-def extract_text(img) -> dict:
+def extract_text(img) -> TextResult:
     """
     Performs OCR using Tesseract
 
@@ -51,13 +51,12 @@ def extract_text(img) -> dict:
         img (cv2.Mat): OpenCV Image
 
     Returns:
-        dict: A dict containing the extracted text and error None or text None, with error if OCR fails.
+        TextResult: A named tuple containing the extracted text and error information.
     """
     custom_config = f'--oem {TESS_OEM} --psm {TESS_PSM} -c tessedit_char_whitelist={TESS_CHARSET}'
     langs = list(TESS_LANGS) if TESS_LANGS else ['eng']
     if 'eng' not in langs:
-        langs = langs + ['eng']
-    result = {}
+        langs.append('eng')
 
     _configure_tesseract()
 
@@ -66,37 +65,30 @@ def extract_text(img) -> dict:
         try:
             text = pytesseract.image_to_string(img, config=custom_config, lang=lang)
         except pytesseract.TesseractNotFoundError:
-            logger.error("Tesseract is not installed or not in your PATH. Please install it.")
-            result['text'] = None
-            result['code'] = OCR.TESSERACT_NOT_INSTALLED
-            result['error'] = OCR.TESSERACT_NOT_INSTALLED.value
-            return result
+            logger.error("Tesseract is not installed or not in your PATH. Please set it up.")
+            return TextResult(text=None, code=OCR.TESSERACT_NOT_INSTALLED, error=OCR.TESSERACT_NOT_INSTALLED.value)
         except pytesseract.TesseractError as e:
             logger.warning(f"OCR with lang '{lang}' failed: {e}. Trying fallback.")
             saw_tesseract_error = True
             continue
-        # Clean up the output by stripping whitespace and newlines
-        text_s = text.strip()
-        idx = text_s.find('_')
-        if idx == -1:
-            idx = text_s.find('-')
+
+        if text:
+            text_s: str = text.strip()
+            idx = text_s.find('_')
             if idx == -1:
-                id = text_s
+                idx = text_s.find('-')
+                if idx == -1:
+                    id = text_s
+                else:
+                    id = text_s[:idx]
             else:
                 id = text_s[:idx]
-        else:
-            id = text_s[:idx]
 
-        if id:
-            result['text'] = id
-            result['code'] = None
-            result['error'] = None
-            return result
-
-    result['text'] = None
-    result['code'] = OCR.TESSERACT_ERROR if saw_tesseract_error else OCR.OCR_EMPTY
-    result['error'] = result['code'].value
-    return result
+            if id:
+                return TextResult(text=id, code=None, error=None)
+    
+    code = OCR.TESSERACT_ERROR if saw_tesseract_error else OCR.OCR_EMPTY
+    return TextResult(text=None, code=code, error=code.value)
 
 
 def site_id_img_2_binary(img) -> np.ndarray:
@@ -119,41 +111,36 @@ def site_id_img_2_binary(img) -> np.ndarray:
     mask = cv2.resize(mask, None, fx=OCR_UPSCALE, fy=OCR_UPSCALE, interpolation=cv2.INTER_LINEAR)
     return mask
 
-def crop_site_id_from_image(image_path: Union[str, Path, np.ndarray], node_bbox) -> dict:
+def crop_site_id_from_image(image_path: Union[str, Path, np.ndarray], node_bbox) -> CropSiteIdResult:
     """
     Crops a nodes' site ID from the topology image
     Args:
-        image_path (str): The path to the full topology image.
+        image_path (Union[str, Path, np.ndarray]): The path to the full topology image.
         node_bbox (list): Bounding box of the detected node in the format [x_min, y_min, x_max, y_max].
 
     Returns:
-        dict: The dictionary containing the cropped site_id image and error None or site_id None and error description if image does not exist or is invalid or any other error.
+        CropSiteIdResult: The result containing the cropped site_id image and error information.
     """
     # Load the image
     img = None
     result = {}
 
     if isinstance(image_path, (str, Path)):
+        if not Path(image_path).resolve().is_file():
+            return CropSiteIdResult(site_id_image=None, code=IMAGE.INVALID_FILE_PATH, error=IMAGE.INVALID_FILE_PATH.value)
         img = cv2.imread(str(image_path))
     elif isinstance(image_path, np.ndarray):
         img = image_path
 
     if img is None:
-        result['site_id_image'] = None
-        result['code'] = IMAGE.EMPTY_INPUT_IMAGE
-        result['error'] = IMAGE.EMPTY_INPUT_IMAGE.value
-        return result
+        return CropSiteIdResult(site_id_image=None, code=IMAGE.EMPTY_INPUT_IMAGE, error=IMAGE.EMPTY_INPUT_IMAGE.value)
 
     x_min, y_min, x_max, y_max = [int(coord) for coord in node_bbox]
 
     if y_min < y_max and x_min < x_max:
         pass
-        #detected_image = img[y_min:y_max, x_min:x_max]
     else:
-        result['site_id_image'] = None
-        result['code'] = IMAGE.OUT_OF_BOUNDS
-        result['error'] = IMAGE.OUT_OF_BOUNDS.value
-        return result
+        return CropSiteIdResult(site_id_image=None, code=IMAGE.OUT_OF_BOUNDS, error=IMAGE.OUT_OF_BOUNDS.value)
 
     row_start = y_max + LABEL_DY_TOP
     row_end = row_start + LABEL_HEIGHT
@@ -165,55 +152,33 @@ def crop_site_id_from_image(image_path: Union[str, Path, np.ndarray], node_bbox)
     row_start < row_end and col_start < col_end):
         site_id_image = img[row_start:row_end, col_start:col_end]
     else:
-        result['site_id_image'] = None
-        result['code'] = IMAGE.OUT_OF_BOUNDS
-        result['error'] = IMAGE.OUT_OF_BOUNDS.value
-        return result
+        return CropSiteIdResult(site_id_image=None, code=IMAGE.OUT_OF_BOUNDS, error=IMAGE.OUT_OF_BOUNDS.value)
 
     if site_id_image.size == 0:
-        result['site_id_image'] = None
-        result['code'] = IMAGE.EMPTY_CROPED_IMAGE
-        result['error'] = IMAGE.EMPTY_CROPED_IMAGE.value
-        return result
+        return CropSiteIdResult(site_id_image=None, code=IMAGE.EMPTY_CROPED_IMAGE, error=IMAGE.EMPTY_CROPED_IMAGE.value)
 
-    result['site_id_image'] = site_id_image
-    result['code'] = None
-    result['error'] = None
-    return result
+    return CropSiteIdResult(site_id_image=site_id_image, code=None, error=None)
 
-def get_site_id_from_node(image_path: Union[str, Path, np.ndarray], node_bbox) -> dict:
+def get_site_id_from_node(image_path: Union[str, Path, np.ndarray], node_bbox) -> SiteIdResult:
     """
     Crops the site ID from a node image and performs OCR.
     Args:
-        image_path (str): The path to the full topology image.
+        image_path (Union[str, Path, np.ndarray]): The path to the full topology image.
         node_bbox (list): Bounding box of the detected node in the format [x_min, y_min, x_max, y_max].
 
     Returns:
-        dict: A dictionary containing the extracted site id text, error None or site id None and error message if OCR fails or errors occured
+        SiteIdResult: A result object containing the extracted site id text, error information, or site id None and error message if OCR fails or errors occured
     """
-    result = {}
-    data = crop_site_id_from_image(image_path, node_bbox)
-    site_id_image = data['site_id_image']
+    site_id_image, code, error = crop_site_id_from_image(image_path, node_bbox)
+    if error is not None:
+        return SiteIdResult(site_id=None, code=code, error=error)
 
-    if site_id_image is None or site_id_image.size == 0:
-        result['site_id'] = None
-        result['code'] = data['code']
-        result['error'] = data['error']
-        return result
+    text, code, error = extract_text(site_id_img_2_binary(site_id_image))
 
-    site_id_binary_image = site_id_img_2_binary(site_id_image)
-    text_result = extract_text(site_id_binary_image)
-
-    if text_result['code'] is None:
-        result['code'] = None
-        result['error'] = None
-        result['site_id'] = text_result['text']
-        return result
+    if error is None:
+        return SiteIdResult(site_id=text, code=None, error=None)
     else:
-        result['code'] = text_result['code']
-        result['error'] = text_result['error']
-        result['site_id'] = None
-        return result
+        return SiteIdResult(site_id=None, code=code, error=error)
 
 def get_class_name(result, c_id) -> str | None:
     """
@@ -232,27 +197,25 @@ def get_class_name(result, c_id) -> str | None:
     return None
 
 
-def match_down_id(down_id: str, node_ids: list) -> list:
+def match_down_id(down_id: str, node_ids: list) -> list[DownIdMatchResult]:
     """
     Scores every node id against down_id, returns matches >= FUZZY_PERCENTAGE best-first.
     Single source of fuzzy-match truth for is_down flags and down-site resolution.
 
     Returns:
-        list: [{'score': int, 'id': str}], sorted by score descending.
+        list: [DownIdMatchResult], sorted by score descending.
     """
-    if not down_id:
-        return []
     matches = [
-        {'score': fuzz.ratio(down_id, node_id), 'id': node_id}
+        DownIdMatchResult(score=fuzz.ratio(down_id, node_id), id=node_id)
         for node_id in node_ids
     ]
     return sorted(
-        (m for m in matches if m['score'] >= FUZZY_PERCENTAGE),
-        key=lambda m: m['score'], reverse=True,
+        (m for m in matches if m.score >= FUZZY_PERCENTAGE),
+        key=lambda m: m.score, reverse=True,
     )
 
 
-def create_node_tensor(nodes: list, down_id: str = None) -> dict:
+def create_node_tensor(nodes: list, down_id: str = None) -> NodeData:
     """
     Create a node features, node centers and node ids from YOLO Detections
 
@@ -260,7 +223,7 @@ def create_node_tensor(nodes: list, down_id: str = None) -> dict:
         nodes (List): List of nodes detected by YOLO from the topology image
         down_id (str): Site Id of the faulty site
     Returns:
-        dict: Dictionary containing node features, node centers, and node ids
+        NodeData: Named tuple containing node features, node centers, and node ids
     """
     if not nodes:
         logger.info('No nodes found, cannot create a graph.')
@@ -269,7 +232,7 @@ def create_node_tensor(nodes: list, down_id: str = None) -> dict:
     node_features = []
     node_centers = []
     node_ids = []
-    matched_ids = {m['id'] for m in match_down_id(down_id, [n['id'] for n in nodes])}
+    matched_ids = {m.id for m in match_down_id(down_id, [node['id'] for node in nodes])}
     for node in nodes:
         feature = TYPE_MAP.get(node['type']) + COLOR_MAP.get(node['color'])
         is_down = 1 if node['id'] in matched_ids else 0
@@ -281,14 +244,14 @@ def create_node_tensor(nodes: list, down_id: str = None) -> dict:
     x = torch.tensor(node_features, dtype=torch.float).to(DEVICE)
     node_centers = np.array(node_centers)
 
-    return {
-        'x': x,
-        'node_centers': node_centers,
-        'node_ids': node_ids
-    }
+    return NodeData(
+        x=x,
+        node_centers=node_centers,
+        node_ids=node_ids
+    )
 
 
-def create_edges_tensor(edges: list, node_centers: list) -> dict:
+def create_edges_tensor(edges: list, node_centers: list) -> EdgeData:
     """
     Creates edges tensors (connective lines in the topology images)
 
@@ -296,21 +259,21 @@ def create_edges_tensor(edges: list, node_centers: list) -> dict:
         edges (List): List of connective lines or edges found in the topology image
         node_centers (List): List of node centers found in the topology image
     Returns:
-        dict: Dictionary containing edge index (connective lines in topology image) and edge attributes
+        EdgeData: Named tuple containing edge index (connective lines in topology image) and edge attributes
     """
     if len(node_centers) == 0:
         logger.warning("No node centers provided, returning empty edge tensors")
-        return {
-            'edge_index': torch.empty((2, 0), dtype=torch.long).contiguous().to(DEVICE),
-            'edge_attr': torch.empty((0, 6), dtype=torch.float).to(DEVICE)
-        }
+        return EdgeData(
+            edge_index=torch.empty((2, 0), dtype=torch.long).contiguous().to(DEVICE),
+            edge_attr=torch.empty((0, 6), dtype=torch.float).to(DEVICE)
+        )
 
     if len(edges) == 0:
         logger.warning("No edges provided, returning empty edge tensors.")
-        return {
-            'edge_index': torch.empty((2, 0), dtype=torch.long).contiguous().to(DEVICE),
-            'edge_attr': torch.empty((0, 6), dtype=torch.float).to(DEVICE)
-        }
+        return EdgeData(
+            edge_index=torch.empty((2, 0), dtype=torch.long).contiguous().to(DEVICE),
+            edge_attr=torch.empty((0, 6), dtype=torch.float).to(DEVICE)
+        )
 
     edge_list = []
     edge_attributes = []
@@ -341,10 +304,10 @@ def create_edges_tensor(edges: list, node_centers: list) -> dict:
     edge_index = torch.tensor(edge_list, dtype=torch.long).t().contiguous() if edge_list else torch.empty((2, 0), dtype=torch.long).contiguous()
     edge_attr = torch.tensor(edge_attributes, dtype=torch.float) if edge_attributes else torch.empty((0, 6), dtype=torch.float)
 
-    return {
-        'edge_index': edge_index.to(DEVICE),
-        'edge_attr': edge_attr.to(DEVICE)
-    }
+    return EdgeData(
+        edge_index=edge_index.to(DEVICE),
+        edge_attr=edge_attr.to(DEVICE)
+    )
 
 def extract_data_from_YOLO(result: list, img: Union[str, Path, np.ndarray]) -> list:
     """
@@ -379,10 +342,8 @@ def extract_data_from_YOLO(result: list, img: Union[str, Path, np.ndarray]) -> l
             edges.append(edge)
         elif any(class_name.startswith(node) for node in NODE_TYPE):
             node_type = class_name.split('_')[0]
-            data = get_site_id_from_node(image_path=img, node_bbox=bbox)
-            site_id = data['site_id']
-            error = data['error']
-            if data['code'] is not None:
+            site_id, code, error = get_site_id_from_node(image_path=img, node_bbox=bbox)
+            if code is not None:
                 logger.warning(error)
                 continue
             node = {'id': site_id, 'type': node_type, 'color': color, 'center': center}

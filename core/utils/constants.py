@@ -55,12 +55,6 @@ def safe_bool(value, fallback: bool):
         return value
     return fallback
 
-def safe_string(value: str, fallback:str) -> str:
-    pattern = r'^[A-Za-z_-.]{1,128}$'
-    if not re.fullmatch(pattern, value):
-        return fallback
-    return value
-
 def safe_ip(value:str, fallback: str) -> str:
     try:
         value = str(ipaddress.ip_address(value))

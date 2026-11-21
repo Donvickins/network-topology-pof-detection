@@ -20,6 +20,7 @@ dependencies = [
   "pyyaml==6.0.3",
   "colorama==0.4.6",
   "torch-geometric==2.8.0.post1",
+  "pytest>=9.1.1",
 ]
 
 [project.optional-dependencies]
@@ -35,11 +36,8 @@ train = ["matplotlib==3.11.2"]
 build = ["nuitka==4.2.1"]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.8.0"]
 build-backend = "hatchling.build_meta"
-
-[tool.hatch.build.targets.wheel]
-packages = ["."]
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
@@ -50,6 +48,9 @@ explicit = true
 name = "pytorch-cu126"
 url = "https://download.pytorch.org/whl/cu126"
 explicit = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 [tool.uv.sources]
 torch = [
@@ -65,7 +66,7 @@ torchvision = [
 
 [tool.uv]
 managed = true
-package = true
+package = false
 conflicts = [
   [{"extra" = "cpu"}, {"extra" = "cuda"}]
 ]

@@ -1,6 +1,5 @@
 import logging
 from uuid import uuid4
-from pathlib import Path
 from core.utils.constants import SAVE_DIR
 from core.utils.paths import get_base_path
 

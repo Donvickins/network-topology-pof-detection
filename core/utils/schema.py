@@ -14,7 +14,7 @@ from PIL import Image
 from pydantic import BaseModel, field_validator, PrivateAttr, model_validator
 from pydantic_core import PydanticCustomError
 from datetime import datetime
-from core.utils.enums import VALIDATION
+from core.utils.types import VALIDATION
 from core.utils.constants import MAX_IMAGE_PX
 
 class POFDTO(BaseModel):
