@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = "==3.12.*"
 resolution-markers = [
     "sys_platform == 'win32'",
@@ -225,7 +225,7 @@ resolution-markers = [
     "sys_platform != 'darwin' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "cuda-pathfinder", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'win32' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "cuda-pathfinder", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/15/d5/572ced1aecc8c8f3e617c3af58d3b1ed5378ed71531c607c960a3e48b516/cuda_bindings-12.9.9-cp312-cp312-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:88c41afe5be41acb17e57977dd534e335f86d0c96d284d71457168525f6327c0", size = 7063842, upload-time = "2026-09-23T03:20:45.94Z" },
@@ -314,43 +314,43 @@ wheels = [
 
 [package.optional-dependencies]
 cublas = [
-    { name = "nvidia-cublas", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "nvidia-cuda-nvrtc", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cublas", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cuda-nvrtc", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 cudart = [
-    { name = "nvidia-cuda-runtime", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cuda-runtime", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 cufft = [
-    { name = "nvidia-cufft", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "nvidia-nvjitlink", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cufft", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-nvjitlink", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 cufile = [
-    { name = "nvidia-cufile", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cufile", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 cupti = [
-    { name = "nvidia-cuda-cupti", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cuda-cupti", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 curand = [
-    { name = "nvidia-curand", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-curand", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 cusolver = [
-    { name = "nvidia-cublas", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "nvidia-cusolver", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "nvidia-cusparse", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "nvidia-nvjitlink", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cublas", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cusolver", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cusparse", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-nvjitlink", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 cusparse = [
-    { name = "nvidia-cusparse", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "nvidia-nvjitlink", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cusparse", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-nvjitlink", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 nvjitlink = [
-    { name = "nvidia-nvjitlink", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-nvjitlink", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 nvrtc = [
-    { name = "nvidia-cuda-nvrtc", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cuda-nvrtc", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 nvtx = [
-    { name = "nvidia-nvtx", marker = "(platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'aarch64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform != 'linux' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-nvtx", marker = "(platform_machine == 'aarch64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (platform_machine == 'x86_64' and sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 
 [[package]]
@@ -494,6 +494,19 @@ wheels = [
 ]
 
 [[package]]
+name = "httpcore2"
+version = "2.16.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "h11" },
+    { name = "truststore" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/92/9d/df40b41f7db0370f82019820709244e7b660c52aa3da3c9e5c4e8141f6e6/httpcore2-2.16.2.tar.gz", hash = "sha256:6c519d0f7b44f7269fa9bbb4d2763db395a4a2370f046d8e8e0a4b38227815d2", size = 70064, upload-time = "2026-11-16T10:12:19.491Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/e8/009c347feac27f8960605aa98d55ed263b5870dd4fd80b82fd1d00d5716c/httpcore2-2.16.2-py3-none-any.whl", hash = "sha256:16051ae2a42f776007543f32de9349a317b23d2cbb4e1456b4bac0e88b87419a", size = 85551, upload-time = "2026-11-16T10:12:16.674Z" },
+]
+
+[[package]]
 name = "httpx"
 version = "0.28.1"
 source = { registry = "https://pypi.org/simple" }
@@ -506,6 +519,32 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b5023f5e79e9956/httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc", size = 141406, upload-time = "2024-12-06T15:37:23.222Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad", size = 73517, upload-time = "2024-12-06T15:37:21.509Z" },
+]
+
+[[package]]
+name = "httpx2"
+version = "2.16.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio", marker = "sys_platform != 'emscripten'" },
+    { name = "httpcore2", marker = "sys_platform != 'emscripten'" },
+    { name = "httpx2-jsfetch", marker = "sys_platform == 'emscripten'" },
+    { name = "idna" },
+    { name = "truststore", marker = "sys_platform != 'emscripten'" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1c/77/6515121dc5ac3c743ad1bff5afe635bcd1a3f23cc40db3c5c89f7d02917d/httpx2-2.16.2.tar.gz", hash = "sha256:748b615678f07d8e3b183efe81ad13b655ca88bfc56ce4589219b2d442860574", size = 103370, upload-time = "2026-11-16T10:12:20.49Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/77/de/8c4306a3d6aa2495111986addf33a9e561eff4c47552e4c4b9251160d0ad/httpx2-2.16.2-py3-none-any.whl", hash = "sha256:f05c13aade4c45dbf1c9060647a1058f0acad62398fad96e741269edb33d46f5", size = 97893, upload-time = "2026-11-16T10:12:18.192Z" },
+]
+
+[[package]]
+name = "httpx2-jsfetch"
+version = "1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cd/c4/0e5636363151a2a1795e0a77617168b9ca438e1748ec05fc9b5687f93d64/httpx2_jsfetch-1.0.tar.gz", hash = "sha256:70a0e3eabfef7cce5ad9c629f7d01ca05e418f586646f4ddf14782e4c1454c60", size = 6872, upload-time = "2026-08-07T00:13:07.492Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9b/43/832f631d32e4f1211caa2ba368317739fe71f0b8530e4c9d15dc454bac2a/httpx2_jsfetch-1.0-py3-none-any.whl", hash = "sha256:cb916b707601e69a07721aabc8f3f6659be3a6893bc1ff5c6f9e02241df2da32", size = 6382, upload-time = "2026-08-07T00:13:06.567Z" },
 ]
 
 [[package]]
@@ -700,7 +739,6 @@ dependencies = [
     { name = "pillow" },
     { name = "pydantic" },
     { name = "pytesseract" },
-    { name = "pytest" },
     { name = "python-levenshtein" },
     { name = "pyyaml" },
     { name = "rapidfuzz" },
@@ -711,9 +749,6 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-build = [
-    { name = "nuitka" },
-]
 cpu = [
     { name = "torch", version = "2.14.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torch", version = "2.14.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
@@ -726,6 +761,10 @@ cuda = [
     { name = "torchvision", version = "0.29.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torchvision", version = "0.29.0+cu126", source = { registry = "https://download.pytorch.org/whl/cu126" }, marker = "(sys_platform != 'darwin' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
+dev = [
+    { name = "httpx2" },
+    { name = "pytest" },
+]
 train = [
     { name = "matplotlib" },
 ]
@@ -735,14 +774,14 @@ requires-dist = [
     { name = "colorama", specifier = "==0.4.6" },
     { name = "fastapi", specifier = "==0.141.1" },
     { name = "fastapi-guard", specifier = "==8.0.2" },
+    { name = "httpx2", marker = "extra == 'dev'", specifier = ">=2.16.2" },
     { name = "matplotlib", marker = "extra == 'train'", specifier = "==3.11.2" },
-    { name = "nuitka", marker = "extra == 'build'", specifier = "==4.2.1" },
     { name = "numpy", specifier = "==2.5.3" },
     { name = "opencv-python", specifier = "==5.0.0.93" },
     { name = "pillow", specifier = "==12.3.0" },
     { name = "pydantic", specifier = "==2.13.5" },
     { name = "pytesseract", specifier = "==0.3.13" },
-    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.1.1" },
     { name = "python-levenshtein", specifier = "==0.27.5" },
     { name = "pyyaml", specifier = "==6.0.3" },
     { name = "rapidfuzz", specifier = "==3.14.6" },
@@ -757,7 +796,7 @@ requires-dist = [
     { name = "ultralytics", specifier = "==8.4.154" },
     { name = "uvicorn", specifier = "==0.53.0" },
 ]
-provides-extras = ["cpu", "cuda", "train", "build"]
+provides-extras = ["cpu", "cuda", "train", "dev"]
 
 [[package]]
 name = "networkx"
@@ -767,12 +806,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/dc/76/3af777226b63a5e64
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7e/cd/fe58041e9011f307c490e3e17dd48cc516448f7c698a3f2d9d9d65d7e6a8/networkx-3.7-py3-none-any.whl", hash = "sha256:e3fd2c13a7814cee3746340d8d7f8598a67f16a58bf47fb7f8793fab6efca1b0", size = 2142205, upload-time = "2026-09-21T16:45:14.609Z" },
 ]
-
-[[package]]
-name = "nuitka"
-version = "4.2.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c7/ce/38409fc853cc26d86ab71ccd53f7dfddbc7a84d4821b9b54db428b35779b/nuitka-4.2.1.tar.gz", hash = "sha256:815c6e571a7a6424af384fe9d95d4ba38f1634d39a5515e8094d7fbfa090cbcb", size = 4632551, upload-time = "2026-09-05T08:08:19.117Z" }
 
 [[package]]
 name = "numpy"
@@ -885,7 +918,7 @@ name = "nvidia-cudnn-cu12"
 version = "9.10.2.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'win32' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cublas-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/41/e79269ce215c857c935fd86bcfe91a451a584dfc27f1e068f568b9ad1ab7/nvidia_cudnn_cu12-9.10.2.21-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:c9132cc3f8958447b4910a1720036d9eff5928cc3179b0a51fb6d167c6cc87d8", size = 705026878, upload-time = "2025-06-06T21:52:51.348Z" },
@@ -924,7 +957,7 @@ name = "nvidia-cufft-cu12"
 version = "11.3.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'win32' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1f/37/c50d2b2f2c07e146776389e3080f4faf70bcc4fa6e19d65bb54ca174ebc3/nvidia_cufft_cu12-11.3.0.4-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:d16079550df460376455cba121db6564089176d9bac9e4f360493ca4741b22a6", size = 200164144, upload-time = "2024-11-20T17:40:58.288Z" },
@@ -994,9 +1027,9 @@ name = "nvidia-cusolver-cu12"
 version = "11.7.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-cublas-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'win32' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "nvidia-cusparse-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'win32' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'win32' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cublas-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-cusparse-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/93/17/dbe1aa865e4fdc7b6d4d0dd308fdd5aaab60f939abfc0ea1954eac4fb113/nvidia_cusolver_cu12-11.7.1.2-py3-none-manylinux2014_aarch64.whl", hash = "sha256:0ce237ef60acde1efc457335a2ddadfd7610b892d94efee7b776c64bb1cac9e0", size = 157833628, upload-time = "2024-10-01T17:05:05.591Z" },
@@ -1024,7 +1057,7 @@ name = "nvidia-cusparse-cu12"
 version = "12.5.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (sys_platform == 'win32' and extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "nvidia-nvjitlink-cu12", marker = "(sys_platform != 'darwin' and sys_platform != 'win32' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/eb/6681efd0aa7df96b4f8067b3ce7246833dd36830bb4cec8896182773db7d/nvidia_cusparse_cu12-12.5.4.2-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:d25b62fb18751758fe3c93a4a08eff08effedfe4edf1c6bb5afd0890fe88f887", size = 216451147, upload-time = "2024-11-20T17:44:18.055Z" },
@@ -1347,7 +1380,7 @@ name = "pytest"
 version = "9.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
@@ -1543,18 +1576,18 @@ resolution-markers = [
 dependencies = [
     { name = "cuda-bindings", version = "13.4.3", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "cuda-toolkit", version = "13.0.3.0", source = { registry = "https://pypi.org/simple" }, extra = ["cublas", "cudart", "cufft", "cufile", "cupti", "curand", "cusolver", "cusparse", "nvjitlink", "nvrtc", "nvtx"], marker = "(sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "filelock", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "fsspec", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "jinja2", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "networkx", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "filelock", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "fsspec", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "jinja2", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "networkx", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "nvidia-cudnn-cu13", marker = "(sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "nvidia-cusparselt-cu13", marker = "(sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "nvidia-nccl-cu13", marker = "(sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "nvidia-nvshmem-cu13", marker = "(sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "setuptools", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "sympy", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "setuptools", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "sympy", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "triton", marker = "(sys_platform == 'linux' and extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "typing-extensions", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "typing-extensions", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/17/76/bb4770f56cf6d8971671dbcbb7493e5a6a15ad2825f4e359b02c27c38297/torch-2.14.0-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:c1f844f1c750e87df4b68bc3afbc0e2b0c7ef19d7b8f666e48bdcf6a0c4f0056", size = 127303200, upload-time = "2026-09-02T13:43:20.311Z" },
@@ -1665,9 +1698,9 @@ resolution-markers = [
     "sys_platform == 'darwin'",
 ]
 dependencies = [
-    { name = "numpy", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "pillow", marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "torch", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "numpy", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "pillow", marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "torch", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a7/d2/9daad500db2ab880eca0f0a569afd73e1afdd49f22c94560c85546dd87c2/torchvision-0.29.0-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:994687b818cac0e6d34cb407a41458e2c3262cb7db927465841c9522ba7ebb92", size = 1813740, upload-time = "2026-09-02T13:47:03.933Z" },
@@ -1719,7 +1752,7 @@ name = "tqdm"
 version = "4.70.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0d/ea/b2a5bd54b28a324dae8211928b2d730b6547500342c7e6c6dea08bd0a485/tqdm-4.70.1.tar.gz", hash = "sha256:cefd0eca11b2a37a3aee776544d4f4ae913f02688135b5556b8788dfa474afc4", size = 171846, upload-time = "2026-09-11T07:25:16.601Z" }
 wheels = [
@@ -1733,6 +1766,15 @@ source = { registry = "https://pypi.org/simple" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/87/07/0f8cd8e8db0472334253efdaaab3d0819fea27aa99bf0e7f1aeea4ceb5ae/triton-3.8.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a9c404c69ed4a39e8ec632eaf6b9fe058a060bf98979c177f6ef666f06bb8d50", size = 226474486, upload-time = "2026-08-28T16:08:18.29Z" },
     { url = "https://files.pythonhosted.org/packages/c1/09/b7012e5bfae67640f268aa584caa80fe1674f6b0da949046b679972c33e3/triton-3.8.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e91ffa46d095b252248297292dd22bcbacd53a125a0c2eefbbbf74925a320bc3", size = 247972921, upload-time = "2026-08-28T15:55:53.157Z" },
+]
+
+[[package]]
+name = "truststore"
+version = "0.10.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ee/9f/c5201d42a484c061e528825fc8e2d565f5abd50a4ced6fb7d29c4ec99b2b/truststore-0.10.5.tar.gz", hash = "sha256:30d36967ccaded5cbb38d602c433f53600036c79d502f4533a49b60a03bbefcd", size = 28091, upload-time = "2026-10-12T22:27:31.808Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/51/e9/3a7820be2bb0fe53b6bc9c3be26d3d1158004e4c3ab953aa6840b955b1e9/truststore-0.10.5-py3-none-any.whl", hash = "sha256:9aaaedaefaf06d8b206278cf8b5012bc897f485a874503501e12d776df78951c", size = 19017, upload-time = "2026-10-12T22:27:30.377Z" },
 ]
 
 [[package]]
@@ -1773,11 +1815,11 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requests" },
     { name = "torch", version = "2.14.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "torch", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "torch", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torch", version = "2.14.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torch", version = "2.14.0+cu126", source = { registry = "https://download.pytorch.org/whl/cu126" }, marker = "(sys_platform != 'darwin' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torchvision", version = "0.29.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "torchvision", version = "0.29.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "torchvision", version = "0.29.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torchvision", version = "0.29.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torchvision", version = "0.29.0+cu126", source = { registry = "https://download.pytorch.org/whl/cu126" }, marker = "(sys_platform != 'darwin' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "ultralytics-platform" },
@@ -1807,7 +1849,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "torch", version = "2.14.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu') or (sys_platform == 'darwin' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
-    { name = "torch", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda')" },
+    { name = "torch", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(extra != 'extra-30-network-topology-pof-detection-cpu' and extra != 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torch", version = "2.14.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and extra == 'extra-30-network-topology-pof-detection-cpu') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
     { name = "torch", version = "2.14.0+cu126", source = { registry = "https://download.pytorch.org/whl/cu126" }, marker = "(sys_platform != 'darwin' and extra == 'extra-30-network-topology-pof-detection-cuda') or (extra == 'extra-30-network-topology-pof-detection-cpu' and extra == 'extra-30-network-topology-pof-detection-cuda')" },
 ]

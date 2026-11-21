@@ -20,7 +20,6 @@ dependencies = [
   "pyyaml==6.0.3",
   "colorama==0.4.6",
   "torch-geometric==2.8.0.post1",
-  "pytest>=9.1.1",
 ]
 
 [project.optional-dependencies]
@@ -33,7 +32,10 @@ cuda = [
   "torchvision==0.29.0",
 ]
 train = ["matplotlib==3.11.2"]
-build = ["nuitka==4.2.1"]
+dev = [
+    "httpx2>=2.16.2",
+    "pytest>=9.1.1",
+]
 
 [build-system]
 requires = ["hatchling>=1.8.0"]
